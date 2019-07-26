@@ -1,0 +1,1 @@
+The cifar-10 data is placed here.s
