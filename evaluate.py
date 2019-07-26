@@ -24,15 +24,21 @@ def evaluate(net, testloader):
 
     net.eval()
 
-    net_dict = net.load_state_dict(t.load(args.restore_path))
+    if t.cuda.is_available():
+        net_dict = net.load_state_dict(t.load(args.restore_path))
+    else:
+        net_dict = net.load_state_dict(t.load(args.restore_path, map_location='cpu'))
 
     coorect = 0
     total = 0
     for data in testloader:
         images, labels = data
+        images = Variable(images)
+        labels = Variable(labels)
 
-        images = Variable(images).cuda()
-        labels = Variable(labels).cuda()
+        if t.cuda.is_available():
+            images = images.cuda()
+            labels = labels.cuda()
         outputs = net(images)
 
         _, predicted = t.max(outputs.data, 1)
@@ -57,6 +63,7 @@ testloader = t.utils.data.DataLoader(testset, batch_size=args.batch_size, shuffl
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 net = resnet56()
-net = net.cuda()
+if t.cuda.is_available():
+    net = net.cuda()
 
 evaluate(net, testloader)

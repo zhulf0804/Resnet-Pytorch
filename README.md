@@ -4,7 +4,7 @@ A Pytorch Implementation of ResNet(56-layers) trained on Cifar-10 with Accuracy 
 
 - [X] train/evaluate model
 - [X] Tensorboard
-- [X] GPU version
+- [X] CPU/GPU version
 
 ## Train
 

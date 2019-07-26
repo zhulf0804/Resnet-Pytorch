@@ -41,7 +41,10 @@ def train():
     else:
         print("Training for scratch...")
 
-    criterion = nn.CrossEntropyLoss().cuda()
+    if t.cuda.is_available():
+        criterion = nn.CrossEntropyLoss().cuda()
+    else:
+        criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=args.init_lr, momentum=0.9)
 
     lr_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[100, 150], last_epoch=-1)
@@ -53,8 +56,10 @@ def train():
         for i, data in enumerate(trainloader):
             inputs, labels = data  # Shape=(batch_size, channels, height, width), (batch_size, )
             inputs, lbales = Variable(inputs), Variable(labels)
-            inputs = inputs.cuda()
-            labels = labels.cuda()
+
+            if t.cuda.is_available():
+                inputs = inputs.cuda()
+                labels = labels.cuda()
 
 
             outputs = net(inputs)
@@ -82,8 +87,12 @@ def train():
             for data in testloader:
                 images, labels = data
 
-                images = Variable(images).cuda()
-                labels = Variable(labels).cuda()
+                images = Variable(images)
+                labels = Variable(labels)
+
+                if t.cuda.is_available():
+                    images = images.cuda()
+                    labels = labels.cuda()
 
                 with t.no_grad():
                     outputs = net(images)
@@ -125,8 +134,9 @@ testloader = t.utils.data.DataLoader(testset, batch_size=args.test_batch_size, s
 #classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 net = resnet56()
-net = net.cuda()
 
+if t.cuda.is_available():
+    net = net.cuda()
 
 
 train()
