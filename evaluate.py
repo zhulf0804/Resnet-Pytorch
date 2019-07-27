@@ -29,7 +29,7 @@ def evaluate(net, testloader):
     else:
         net_dict = net.load_state_dict(t.load(args.restore_path, map_location='cpu'))
 
-    coorect = 0
+    correct = 0
     total = 0
     for data in testloader:
         images, labels = data
@@ -45,10 +45,10 @@ def evaluate(net, testloader):
 
         total += labels.size(0)
 
-        coorect += (predicted == labels).sum()
+        correct += (predicted == labels).sum()
 
-    accuracy = coorect.double() * 1.0 / total
-    print("Total: %d, Correct: %d, Accuracy: %f" % (total, coorect.double(), accuracy))
+    accuracy = correct.double() * 1.0 / total
+    print("Total: %d, Correct: %d, Accuracy: %f" % (total, correct.double(), accuracy))
 
 
 # for dataset

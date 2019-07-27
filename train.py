@@ -39,7 +39,7 @@ def train():
         net.load_state_dict(t.load(restore_path))
         print("Parameters are restored from %s" %restore_path)
     else:
-        print("Training for scratch...")
+        print("Training from scratch...")
 
     if t.cuda.is_available():
         criterion = nn.CrossEntropyLoss().cuda()
@@ -52,15 +52,14 @@ def train():
     writer = SummaryWriter(args.log_dir)
 
     for epoch in range(args.epoches + 1):
-        #running_loss = 0.0
+
         for i, data in enumerate(trainloader):
             inputs, labels = data  # Shape=(batch_size, channels, height, width), (batch_size, )
-            inputs, lbales = Variable(inputs), Variable(labels)
+            inputs, labels = Variable(inputs), Variable(labels)
 
             if t.cuda.is_available():
                 inputs = inputs.cuda()
                 labels = labels.cuda()
-
 
             outputs = net(inputs)
 
@@ -81,7 +80,7 @@ def train():
             t.save(net.state_dict(), os.path.join(args.saved_dir, 'resnet_%d.pth'%epoch))
 
             net.eval()
-            coorect = 0
+            correct = 0
             total = 0
             losses = 0
             for data in testloader:
@@ -102,10 +101,10 @@ def train():
                 losses += loss.data.item()
                 _, predicted = t.max(outputs.data, 1)
                 total += labels.size(0)
-                coorect += (predicted == labels).sum()
+                correct += (predicted == labels).sum()
 
-            accuracy = coorect.double() * 1.0 / total
-            print("Epoch: %d, Lr: %f, Total: %d, Correct: %d, Accuracy: %f, Test loss: %f" % (epoch, optimizer.param_groups[0]['lr'], total, coorect.double(), accuracy, losses / (args.test_samples / args.test_batch_size)))
+            accuracy = correct.double() * 1.0 / total
+            print("Epoch: %d, Lr: %f, Total: %d, Correct: %d, Accuracy: %f, Test loss: %f" % (epoch, optimizer.param_groups[0]['lr'], total, correct.double(), accuracy, losses / (args.test_samples / args.test_batch_size)))
 
             net.train()
             
