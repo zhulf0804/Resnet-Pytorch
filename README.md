@@ -34,6 +34,10 @@ A Pytorch Implementation of ResNet(56-layers) trained on Cifar-10 with Accuracy 
     python evaluate.py --restore_path your_path
     ```
     
+## Loss
+
+![](./log/loss.png)
+    
 ## Reference
 
 + [https://github.com/akamaster/pytorch_resnet_cifar10](https://github.com/akamaster/pytorch_resnet_cifar10)
