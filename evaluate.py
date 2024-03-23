@@ -1,5 +1,7 @@
 import argparse
 import os
+import cv2
+import tifffile
 import time
 
 import torch as t
@@ -13,7 +15,7 @@ from torch.autograd import Variable
 from resnet import resnet56
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size', default=128, type=int, help='batch size')
+parser.add_argument('--batch_size', default=1, type=int, help='batch size')
 parser.add_argument('--restore_path', default='./checkpoint/resnet_180.pth', type=str, help='the path to restore parameters')
 parser.add_argument('--data_dir', default='./data', type=str, help='the path to save data.')
 parser.add_argument('--num_workers', default=4, type=int, help='the number of workers')
@@ -31,8 +33,12 @@ def evaluate(net, testloader):
 
     correct = 0
     total = 0
-    for data in testloader:
+    for i, data in enumerate(testloader):
         images, labels = data
+        if i < 10:
+            img = images[0].permute(1, 2, 0).detach().cpu().numpy()
+            label = labels[0].detach()
+            tifffile.imwrite('data/{}_{}.tiff'.format(i, label), img)
         images = Variable(images)
         labels = Variable(labels)
 
@@ -42,6 +48,9 @@ def evaluate(net, testloader):
         outputs = net(images)
 
         _, predicted = t.max(outputs.data, 1)
+
+        if i < 10:
+            print(i, outputs[0].detach().cpu().numpy(), predicted[0].detach().cpu().numpy(), labels[0].detach().cpu().numpy())
 
         total += labels.size(0)
 
